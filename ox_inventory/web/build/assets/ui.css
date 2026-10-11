@@ -10,8 +10,8 @@
   --bg-rgb: 18, 12, 30;
   --accent-soft: rgba(var(--accent-rgb), .35);
   --accent-glow: rgba(var(--accent-light-rgb), .55);
-  --slot-bg: rgba(255, 255, 255, .045);
-  --slot-border: rgba(255, 255, 255, .09);
+  --slot-bg: rgba(8, 8, 12, .62);
+  --slot-border: rgba(255, 255, 255, .06);
   --panel-text: #fff;
   --muted: rgba(255, 255, 255, .55);
   --scale: 1;
@@ -143,12 +143,12 @@ button { font-family: inherit; }
 .cloth-col { position: absolute; top: 0; display: flex; flex-direction: column; gap: 11.3px; }
 .cloth-col.l { left: 0; }
 .cloth-col.r { right: 0; }
-.center-tools { position: absolute; left: 0; right: 0; top: 625px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .amount { display: flex; align-items: center; gap: 0; background: rgba(255, 255, 255, .07); border-radius: 8px; overflow: hidden; border: 1px solid var(--slot-border); }
 .amount button { width: 30px; height: 30px; border: 0; background: transparent; color: #fff; font-size: 18px; font-weight: 700; cursor: pointer; }
 .amount button:hover { background: var(--accent-soft); }
 .amount input { width: 64px; height: 30px; text-align: center; border: 0; outline: 0; background: transparent; color: #fff; font: 700 13px 'Plus Jakarta Sans', sans-serif; user-select: text; -moz-appearance: textfield; }
 .amount input::-webkit-outer-spin-button, .amount input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.amount-box { position: absolute; left: 97px; top: 772px; display: flex; align-items: center; gap: 12px; }
 .amount-label { font-size: 10.5px; color: var(--muted); font-weight: 600; letter-spacing: .3px; text-transform: uppercase; }
 
 #help-btn { position: absolute; right: 52px; bottom: 36px; width: 36px; height: 40px; border: 0; cursor: pointer; color: #fff; display: grid; place-items: center; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: rgba(255, 255, 255, .12); }
@@ -214,3 +214,15 @@ button { font-family: inherit; }
 .notif img { width: 40px; height: 40px; object-fit: contain; }
 .notif .n-name { font-size: 12.5px; font-weight: 700; }
 .notif .n-text { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+/* ---------- Bloc Tenue (bas, centre) ---------- */
+.tenue-row { position: absolute; left: 578px; width: 442px; top: 742px; display: flex; justify-content: center; align-items: center; gap: 34px; }
+.hex-btn { width: 54px; height: 60px; border: 0; cursor: pointer; display: grid; place-items: center; color: #fff; background: rgba(8, 8, 12, .7); clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); transition: background .15s; }
+.hex-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.hex-btn:hover { background: rgba(var(--accent-rgb), .55); }
+.hex-btn.active { background: linear-gradient(160deg, var(--accent-light), var(--accent-dark)); }
+.tenue-slot { position: relative; width: 73px; height: 73px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, .18); background: var(--slot-bg); cursor: pointer; color: #fff; overflow: hidden; padding: 0; }
+.tenue-slot:hover { border-color: rgba(var(--accent-light-rgb), .6); }
+.tenue-slot img { position: absolute; inset: 4px 4px 16px 4px; width: calc(100% - 8px); height: calc(100% - 20px); object-fit: contain; }
+.tenue-slot span { position: absolute; left: 0; right: 0; bottom: 3px; text-align: center; font-size: 9.5px; font-weight: 700; text-shadow: 0 1px 3px #000; }
+.tenue-slot.no-img::before { content: ''; position: absolute; left: 50%; top: 40%; width: 20px; height: 30px; transform: translate(-50%, -50%); border-radius: 10px 10px 4px 4px; background: rgba(255, 255, 255, .22); }

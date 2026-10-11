@@ -140,6 +140,7 @@
     car: '<svg viewBox="0 0 24 24"><path d="M5 16V11l2-5h10l2 5v5M3 16h18v3H3zM7 13h.01M17 13h.01"/></svg>',
     cart: '<svg viewBox="0 0 24 24"><path d="M3 4h2l2.5 11h10L20 7H6.5"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></svg>',
     hammer: '<svg viewBox="0 0 24 24"><path d="m14 6 4 4M4 20l9-9M12 5l3-2 5 5-2 3Z"/></svg>',
+    plane: '<svg viewBox="0 0 24 24"><path d="M2 13l20-8-8 16-3-7Z"/></svg>',
     help: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></svg>'
   };
   const TYPE_ICON = { player: 'user', otherplayer: 'user', drop: 'bag', newdrop: 'bag', trunk: 'car', glovebox: 'car', shop: 'cart', crafting: 'hammer', container: 'box' };
@@ -175,14 +176,6 @@
         <div class="cloth-area">
           <div class="cloth-col l" data-role="cloth-l"></div>
           <div class="cloth-col r" data-role="cloth-r"></div>
-          <div class="center-tools">
-            <div class="amount-label" data-role="amount-label">Quantité</div>
-            <div class="amount">
-              <button type="button" data-role="amount-minus">−</button>
-              <input type="number" min="0" value="0" data-role="amount">
-              <button type="button" data-role="amount-plus">+</button>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -204,6 +197,21 @@
           <div class="grid" data-role="grid"></div>
         </div>
       </section>
+
+      <div class="amount-box">
+        <div class="amount-label" data-role="amount-label">Quantité</div>
+        <div class="amount">
+          <button type="button" data-role="amount-minus">−</button>
+          <input type="number" min="0" value="0" data-role="amount">
+          <button type="button" data-role="amount-plus">+</button>
+        </div>
+      </div>
+
+      <div class="tenue-row" id="tenue-row">
+        <button type="button" class="hex-btn active" data-ui-btn="character" title="Personnage">${ICON.user}</button>
+        <button type="button" class="tenue-slot" data-ui-btn="outfit"><img data-role="tenue-img" alt=""><span data-role="tenue-label">Tenue</span></button>
+        <button type="button" class="hex-btn" data-ui-btn="extra" title="Autre">${ICON.plane}</button>
+      </div>
 
       <button id="help-btn" type="button" title="Contrôles utiles">${ICON.help}</button>
     </div>
@@ -277,6 +285,25 @@
     root.setProperty('--bg-rgb', bg.join(', '));
   }
   applyTheme((window.INVENTORY_THEME && window.INVENTORY_THEME.color) || '#7b4bb8');
+
+  /* ---------- logo & bloc Tenue (configurables dans theme.js) ---------- */
+  (function applyBranding() {
+    const cfg = window.INVENTORY_THEME || {};
+    const logo = $('#logo');
+    if (cfg.logo === false) logo.style.display = 'none';
+    else if (typeof cfg.logo === 'string' && cfg.logo) logo.src = cfg.logo;
+    const t = cfg.tenue || {};
+    if (t.enabled === false) $('#tenue-row').style.display = 'none';
+    $('[data-role=tenue-label]').textContent = t.label || 'Tenue';
+    const img = $('[data-role=tenue-img]');
+    if (t.image) img.src = t.image; else img.style.display = 'none';
+    const slot = $('#tenue-row .tenue-slot');
+    if (!t.image) slot.classList.add('no-img');
+    if (t.hideButtons) app.querySelectorAll('#tenue-row .hex-btn').forEach(b => { b.style.display = 'none'; });
+  })();
+
+  // les boutons du bloc Tenue préviennent le client Lua (évènement ox_inventory:uiButton)
+  app.querySelectorAll('[data-ui-btn]').forEach(b => b.addEventListener('click', () => nui('uiButton', { id: b.dataset.uiBtn })));
 
   /* ---------- échelle ---------- */
   function rescale() {
