@@ -17,7 +17,7 @@ shared = {
     framework = GetConvar('inventory:framework', 'esx'),
     clothing = GetConvarInt('inventory:clothing', 1) == 1,
     rarity = GetConvarInt('inventory:rarity', 0) == 1,
-    rename = GetConvarInt('inventory:rename', 0) == 1,
+    rename = GetConvarInt('inventory:rename', 1) == 1,
     throwing = GetConvarInt('inventory:throwing', 1) == 1,
     playerweight = GetConvarInt('inventory:weight', 30000),
     target = GetConvarInt('inventory:target', 0) == 1,

@@ -554,11 +554,22 @@ end)
 
 RegisterNetEvent('ox_inventory:renameSlot', function(slot, name)
 	local _source = source
+	if not shared.rename then return end
+	if type(slot) ~= 'number' or type(name) ~= 'string' then return end
+
 	local inventory = Inventory(_source)
 
 	if not inventory then return end
 	local itemData = inventory.items[slot]
 	if itemData then
+		-- pas de renommage des monnaies ni des pieces de vetements portees (la tenue peut etre renommee)
+		if itemData.name == 'money' or itemData.name == 'black_money' then return end
+		if itemData.name:find('^clothes_') and itemData.name ~= shared.outfititem then return end
+
+		-- nettoyage : caracteres de controle retires, espaces simplifies, 1 a 50 caracteres
+		name = name:gsub('[%c]', ''):gsub('%s+', ' '):gsub('^%s', ''):gsub('%s$', '')
+		if #name < 1 or #name > 50 then return end
+
 		if not itemData.metadata then itemData.metadata = {} end
 		itemData.metadata.label = name
 		Inventory.SetMetadata(inventory.id, slot, itemData.metadata)

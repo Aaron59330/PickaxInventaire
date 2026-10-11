@@ -1837,7 +1837,7 @@ local function renameSlot(slot)
 
 	if not input then return end
 	local newName = input[1]:sub(1, 50):gsub('%s+', ' '):gsub('^%s', ''):gsub('%s$', '')
-	if newName:len() < 3 or newName:len() > 50 then
+	if newName:len() < 1 or newName:len() > 50 then
 		return lib.notify({ type = 'error', description = locale('invalid_item_name') })
 	end
 
