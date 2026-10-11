@@ -21,6 +21,12 @@ window.INVENTORY_THEME = {
   // Opacité du fond des cases : 0 = transparent, 1 = noir plein (0.36 par défaut)
   slotOpacity: 0.36,
 
+  // Contour des cases
+  slotBorder: true,           // true = contour affiché, false = aucun contour
+  slotBorderColor: '#ffffff', // couleur du contour (#RRGGBB)
+  slotBorderOpacity: 0.14,    // opacité de 0 à 1
+  slotBorderWidth: 1,         // épaisseur en pixels (0 à 4)
+
   // Logo affiché en haut au milieu : remplace web/build/assets/logo.png
   // par ton image (PNG transparent), ou mets logo: false pour le masquer.
   logo: 'assets/logo.png',

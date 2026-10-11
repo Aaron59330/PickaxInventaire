@@ -290,6 +290,17 @@
     const logo = $('#logo');
     if (cfg.logo === false) logo.style.display = 'none';
     else if (typeof cfg.logo === 'string' && cfg.logo) logo.src = cfg.logo;
+    // contour des cases (couleur, opacité, épaisseur, on/off)
+    {
+      const root = document.documentElement.style;
+      const enabled = cfg.slotBorder !== false;
+      const hex = /^#?([0-9a-f]{6})$/i.exec(String(cfg.slotBorderColor || '#ffffff').trim());
+      const n = parseInt((hex || [0, 'ffffff'])[1], 16);
+      const op = typeof cfg.slotBorderOpacity === 'number' ? Math.max(0, Math.min(1, cfg.slotBorderOpacity)) : 0.14;
+      const w = typeof cfg.slotBorderWidth === 'number' ? Math.max(0, Math.min(4, cfg.slotBorderWidth)) : 1;
+      root.setProperty('--slot-border', enabled ? `rgba(${n >> 16 & 255}, ${n >> 8 & 255}, ${n & 255}, ${op})` : 'transparent');
+      root.setProperty('--slot-border-width', enabled ? `${w}px` : '0px');
+    }
     // opacité du fond des cases (0 = transparent, 1 = noir plein)
     if (typeof cfg.slotOpacity === 'number') {
       const o = Math.max(0, Math.min(1, cfg.slotOpacity));

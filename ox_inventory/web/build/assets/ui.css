@@ -11,7 +11,8 @@
   --accent-soft: rgba(var(--accent-rgb), .35);
   --accent-glow: rgba(var(--accent-light-rgb), .55);
   --slot-bg: rgba(8, 8, 12, .36);
-  --slot-border: rgba(255, 255, 255, .06);
+  --slot-border: rgba(255, 255, 255, .14);
+  --slot-border-width: 1px;
   --panel-text: #fff;
   --muted: rgba(255, 255, 255, .55);
   --scale: 1;
@@ -98,7 +99,7 @@ button { font-family: inherit; }
 /* ---------- Slot ---------- */
 .slot {
   position: relative; width: 73px; height: 73px; border-radius: 6px; background: var(--slot-bg);
-  border: 1px solid var(--slot-border); overflow: hidden; transition: border-color .12s, background .12s, opacity .12s, filter .12s;
+  border: var(--slot-border-width) solid var(--slot-border); overflow: hidden; transition: border-color .12s, background .12s, opacity .12s, filter .12s;
 }
 .slot:hover { border-color: rgba(var(--accent-light-rgb), .55); background: rgba(var(--accent-light-rgb), .12); }
 .slot.over { border-color: var(--accent-2); background: rgba(var(--accent-light-rgb), .22); box-shadow: 0 0 14px var(--accent-glow); }
@@ -224,7 +225,7 @@ button { font-family: inherit; }
 .tenue-slot.no-img::before { content: ''; position: absolute; left: 50%; top: 40%; width: 20px; height: 30px; transform: translate(-50%, -50%); border-radius: 10px 10px 4px 4px; background: rgba(255, 255, 255, .22); }
 
 /* Slot "Tenue" réel (dernier slot du joueur) */
-.slot.outfit { width: 73px; height: 73px; border-color: rgba(255, 255, 255, .18); }
+.slot.outfit { width: 73px; height: 73px; }
 .slot.outfit .label { display: block; bottom: 3px; font-size: 9.5px; }
 .slot.outfit:not(.has)::before { content: ''; position: absolute; left: 50%; top: 42%; width: 40px; height: 40px; transform: translate(-50%, -50%); background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M32 10a4 4 0 1 1 4 4c-2.200.6-4 2-4 4.500v2.500'/><path d='M32 21 6 40a2.500 2.500 0 0 0 1.500 4.500h49A2.500 2.500 0 0 0 58 40Z'/></svg>") center / contain no-repeat; opacity: .32; transition: opacity .15s; }
 .slot.outfit:hover::before { opacity: .55; }
