@@ -231,6 +231,6 @@ button { font-family: inherit; }
 .slot.outfit.has img.pic { width: 44px; height: 44px; top: 44%; }
 .slot.outfit .count { display: none !important; }
 
-.slot.outfit { background: radial-gradient(circle at 50% 38%, rgba(var(--accent-light-rgb), .22), transparent 70%), var(--slot-bg); box-shadow: 0 0 0 1px rgba(var(--accent-light-rgb), .18), 0 0 16px rgba(var(--accent-rgb), .25); }
-.slot.outfit.has img.pic { width: 54px; height: 54px; top: 42%; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .55)); }
+
+.slot.outfit.has img.pic { width: 54px; height: 54px; top: 42%; }
 .slot.outfit .label { font-size: 9.5px; letter-spacing: .3px; text-transform: uppercase; opacity: .85; }
