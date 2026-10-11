@@ -33,6 +33,7 @@ local invBusy = true
 
 ---@type boolean?
 local invOpen = false
+local invClosing = false
 local plyState = LocalPlayer.state
 local IsPedCuffed = IsPedCuffed
 local playerPed = cache.ped
@@ -280,6 +281,7 @@ function client.openInventory(inv, data)
         end
     end
 
+    invOpen = true
     plyState:set('invOpen', true, true)
 
     SetInterval(client.interval, 100)
@@ -361,6 +363,7 @@ exports('openInventory', client.openInventory)
 RegisterNetEvent('ox_inventory:forceOpenInventory', function(left, right)
 	if source == '' then return end
 
+	invOpen = true
 	plyState:set('invOpen', true, true)
 
 	SetInterval(client.interval, 100)
@@ -1026,6 +1029,7 @@ function client.closeInventory(server)
 
 	if invOpen then
 		invOpen = nil
+		invClosing = true
 		SetNuiFocus(false, false)
 		SetNuiFocusKeepInput(false)
 		Utils.blurOut()
@@ -1035,14 +1039,14 @@ function client.closeInventory(server)
 		SetInterval(client.interval, 200)
 		Wait(200)
 
-		if invOpen ~= nil then return end
-
 		if not server and currentInventory then
 			TriggerServerEvent('ox_inventory:closeInventory')
 		end
 
 		currentInventory = nil
 		defaultInventory.coords = nil
+		invOpen = false
+		invClosing = false
 		plyState:set('invOpen', false, true)
 		TriggerEvent('p_itemclothes:togglePed', false)
 	end
@@ -1264,6 +1268,8 @@ end)
 ---@type function?
 local function setStateBagHandler(stateId)
 	AddStateBagChangeHandler('invOpen', stateId, function(_, _, value)
+		-- l'echo du statebag arrive en retard: l'ignorer pendant la fermeture
+		if invClosing then return end
 		invOpen = value
 	end)
 
@@ -1735,6 +1741,7 @@ end)
 RegisterNetEvent('ox_inventory:viewInventory', function(left, right)
 	if source == '' then return end
 
+	invOpen = true
 	plyState:set('invOpen', true, true)
 
 	SetInterval(client.interval, 100)
@@ -2107,5 +2114,25 @@ lib.callback.register('ox_inventory:getVehicleData', function(netid)
 
 	if entity then
 		return GetEntityModel(entity), GetVehicleClass(entity)
+	end
+end)
+
+-- filet de securite: si l'inventaire est marque ouvert sans focus NUI, on le ferme (evite le personnage fige)
+CreateThread(function()
+	local strikes = 0
+
+	while true do
+		Wait(500)
+
+		if invOpen == true and not invClosing and not IsNuiFocused() then
+			strikes += 1
+
+			if strikes >= 3 then
+				strikes = 0
+				client.closeInventory()
+			end
+		else
+			strikes = 0
+		end
 	end
 end)
