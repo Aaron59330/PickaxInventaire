@@ -290,6 +290,10 @@
     const logo = $('#logo');
     if (cfg.logo === false) logo.style.display = 'none';
     else if (typeof cfg.logo === 'string' && cfg.logo) logo.src = cfg.logo;
+    // fond teinté derrière l'inventaire (désactivable dans theme.js)
+    const bd = $('#backdrop');
+    if (cfg.backdrop === false) bd.style.display = 'none';
+    else if (typeof cfg.backdropOpacity === 'number') bd.style.setProperty('--backdrop-opacity', String(Math.max(0, Math.min(1, cfg.backdropOpacity))));
     const t = cfg.tenue || {};
     if (t.enabled === false) $('#tenue-row').style.display = 'none';
     $('[data-role=tenue-label]').textContent = t.label || 'Tenue';

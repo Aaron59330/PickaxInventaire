@@ -10,6 +10,14 @@
 window.INVENTORY_THEME = {
   color: '#7b4bb8',
 
+  // Fond sombre teinté derrière l'inventaire (le « flou violet ») :
+  //   backdrop: false          -> aucun fond
+  //   backdropOpacity: 0 à 1   -> intensité (1 = par défaut)
+  // Le flou de l'écran du jeu (derrière l'interface) se règle côté serveur :
+  //   set inventory:screenblur 0   dans server.cfg
+  backdrop: true,
+  backdropOpacity: 1,
+
   // Logo affiché en haut au milieu : remplace web/build/assets/logo.png
   // par ton image (PNG transparent), ou mets logo: false pour le masquer.
   logo: 'assets/logo.png',

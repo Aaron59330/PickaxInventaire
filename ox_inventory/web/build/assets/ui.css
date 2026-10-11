@@ -31,7 +31,7 @@ button { font-family: inherit; }
   position: fixed; inset: 0; opacity: 0; transition: opacity .18s ease;
   background: radial-gradient(ellipse at center, rgba(var(--bg-rgb), .35) 0%, rgba(var(--bg-rgb), .75) 100%);
 }
-#app.open #backdrop { opacity: 1; }
+#app.open #backdrop { opacity: var(--backdrop-opacity, 1); }
 
 /* ---------- Scène à taille fixe, mise à l'échelle ---------- */
 #stage {
