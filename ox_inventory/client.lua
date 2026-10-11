@@ -119,12 +119,12 @@ local Inventory = require 'modules.inventory.client'
 ---@return boolean?
 local antiSpam = GetGameTimer()
 function client.openInventory(inv, data)
-	Citizen.Wait(200)
+	Citizen.Wait(50)
 	if antiSpam > GetGameTimer() then
 		return
 	end
 
-	antiSpam = GetGameTimer() + 500
+	antiSpam = GetGameTimer() + 300
 
 	if invOpen then
 		if not inv and currentInventory.type == 'newdrop' then
@@ -428,7 +428,7 @@ lib.callback.register('ox_inventory:usingItem', function(data, noAnim)
 			disable = item.disable,
 			anim = item.anim or item.scenario,
 			prop = item.prop --[[@as ProgressProps]]
-		})) and not PlayerData.dead
+		})) and not IsEntityDead(cache.ped)
 
 		if success then
 			if item.notification then
@@ -452,7 +452,7 @@ local function canUseItem(isAmmo)
 	return not usingItem
     and (not isAmmo or currentWeapon)
 	and PlayerData.loaded
-	and not PlayerData.dead
+	and not IsEntityDead(ped)
 	and not invBusy
 	and not lib.progressActive()
 	and not IsPedRagdoll(ped)
@@ -482,7 +482,7 @@ local function useItem(data, cb, noAnim)
 
     if invOpen and data.close then 
 		client.closeInventory() 
-		Citizen.Wait(200)
+		Citizen.Wait(100)
 	end
 
     usingItem = true
@@ -501,7 +501,7 @@ local function useItem(data, cb, noAnim)
         TriggerEvent('ox_inventory:usedItem', slotData.name, slotData.slot, next(slotData.metadata) and slotData.metadata)
     end
 
-	Wait(500)
+	Wait(250)
     usingItem = false
 end
 
@@ -548,7 +548,7 @@ local function useSlot(slot, noAnim)
 		elseif data.client then
 			if invOpen and data.close then 
 				client.closeInventory() 
-				Citizen.Wait(200)
+				Citizen.Wait(100)
 			end
 
 			if data.export then
@@ -769,7 +769,7 @@ local function throwSlot(slot)
 				TaskPlayAnim(cache.ped, animDict, 'throw_h_fb_stand', 8.0, -8.0, 1500, 49, 0, false, false, false)
 				isThrowing = false
 				lib.hideTextUI()
-				Citizen.Wait(200)
+				Citizen.Wait(100)
 				local forward = GetEntityForwardVector(cache.ped)
 				DetachEntity(throwObj, true, true)
 				Citizen.Wait(1)
