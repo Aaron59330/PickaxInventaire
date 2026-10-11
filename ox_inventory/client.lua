@@ -33,6 +33,7 @@ local invBusy = true
 
 ---@type boolean?
 local invOpen = false
+local invClosing = false
 local plyState = LocalPlayer.state
 local IsPedCuffed = IsPedCuffed
 local playerPed = cache.ped
@@ -281,6 +282,7 @@ function client.openInventory(inv, data)
         end
     end
 
+    invOpen = true
     plyState:set('invOpen', true, true)
 
     SetInterval(client.interval, 100)
@@ -362,6 +364,7 @@ exports('openInventory', client.openInventory)
 RegisterNetEvent('ox_inventory:forceOpenInventory', function(left, right)
 	if source == '' then return end
 
+	invOpen = true
 	plyState:set('invOpen', true, true)
 
 	SetInterval(client.interval, 100)
@@ -1027,6 +1030,7 @@ function client.closeInventory(server)
 
 	if invOpen then
 		invOpen = nil
+		invClosing = true
 		SetNuiFocus(false, false)
 		SetNuiFocusKeepInput(false)
 		Utils.blurOut()
@@ -1035,14 +1039,14 @@ function client.closeInventory(server)
 		SetInterval(client.interval, 200)
 		Wait(50)
 
-		if invOpen ~= nil then return end
-
 		if not server and currentInventory then
 			TriggerServerEvent('ox_inventory:closeInventory')
 		end
 
 		currentInventory = nil
 		defaultInventory.coords = nil
+		invOpen = false
+		invClosing = false
 		plyState:set('invOpen', false, true)
 		TriggerEvent('p_itemclothes:togglePed', false)
 	end
@@ -1264,6 +1268,8 @@ end)
 ---@type function?
 local function setStateBagHandler(stateId)
 	AddStateBagChangeHandler('invOpen', stateId, function(_, _, value)
+		-- ignore l'echo du statebag pendant la fermeture (sinon le joueur reste fige)
+		if invClosing then return end
 		invOpen = value
 	end)
 
@@ -1735,6 +1741,7 @@ end)
 RegisterNetEvent('ox_inventory:viewInventory', function(left, right)
 	if source == '' then return end
 
+	invOpen = true
 	plyState:set('invOpen', true, true)
 
 	SetInterval(client.interval, 100)
