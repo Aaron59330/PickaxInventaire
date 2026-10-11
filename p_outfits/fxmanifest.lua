@@ -3,8 +3,8 @@ game 'gta5'
 lua54 'yes'
 
 name 'p_outfits'
-description 'Tenues sauvegardees (ESX) - branche sur le bloc "Tenue" de ox_inventory et p_itemclothes'
-version '1.0.0'
+description 'Tenues completes : item "Tenue" a glisser sur la case Tenue de ox_inventory (equipe / retire toutes les pieces, avec p_itemclothes)'
+version '2.0.0'
 
 shared_scripts {
     '@ox_lib/init.lua',
@@ -12,16 +12,10 @@ shared_scripts {
 }
 
 client_script 'client.lua'
-
-server_scripts {
-    '@oxmysql/lib/MySQL.lua',
-    'server.lua',
-}
+server_script 'server.lua'
 
 dependencies {
     'ox_lib',
-    'oxmysql',
-    'es_extended',
     'ox_inventory',
     'p_itemclothes',
 }

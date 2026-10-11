@@ -1,89 +1,205 @@
-local ESX = exports['es_extended']:getSharedObject()
+local ITEM = Config.ItemName
+local PED_MALE = 1885233650
 
-MySQL.ready(function()
-    MySQL.query.await([[
-        CREATE TABLE IF NOT EXISTS `p_outfits` (
-            `id` INT NOT NULL AUTO_INCREMENT,
-            `identifier` VARCHAR(80) NOT NULL,
-            `name` VARCHAR(60) NOT NULL,
-            `data` LONGTEXT NOT NULL,
-            PRIMARY KEY (`id`),
-            KEY `identifier` (`identifier`)
-        )
-    ]])
-end)
-
-local function getIdentifier(src)
-    local xPlayer = ESX.GetPlayerFromId(src)
-    return xPlayer and xPlayer.identifier
+local function getSlots()
+    local ok, slots = pcall(function() return exports.p_itemclothes:getClothingSlots() end)
+    return ok and type(slots) == 'table' and slots or {}
 end
 
--- cles de skin autorisees = celles gerees par p_itemclothes (14 emplacements)
-local function getAllowedKeys()
-    local allowed = {}
-    local ok, slots = pcall(function() return exports.p_itemclothes:getClothingSlots() end)
-    if not ok or type(slots) ~= 'table' then return allowed end
+local function getOutfitSlot()
+    return exports.ox_inventory:getOutfitSlot()
+end
 
-    for _, slot in pairs(slots) do
-        for _, sex in pairs(slot.skin or {}) do
-            for key in pairs(sex) do allowed[key] = true end
+local function sexOf(src)
+    local ped = GetPlayerPed(src)
+    return (ped and ped ~= 0 and GetEntityModel(ped) ~= PED_MALE) and 'female' or 'male'
+end
+
+-- cles de skin gerees par p_itemclothes (14 emplacements), tous sexes confondus
+local function allowedKeys()
+    local keys = {}
+    for _, slot in pairs(getSlots()) do
+        for _, skin in pairs(slot.skin or {}) do
+            for key in pairs(skin) do keys[key] = true end
         end
     end
-
-    return allowed
+    return keys
 end
 
-local function sanitizeOutfit(data)
-    if type(data) ~= 'table' then return end
+--- Nettoie une tenue recue (cle -> entier borne). Renvoie nil si vide.
+local function sanitize(skin)
+    if type(skin) ~= 'table' then return end
+    local allowed, clean, n = allowedKeys(), {}, 0
 
-    local allowed, clean, count = getAllowedKeys(), {}, 0
-
-    for key, value in pairs(data) do
+    for key, value in pairs(skin) do
         if allowed[key] and type(value) == 'number' and value == value and value % 1 == 0 and value >= -1 and value <= 10000 then
             clean[key] = value
-            count += 1
+            n += 1
         end
     end
 
-    return count > 0 and clean or nil
+    return n > 0 and clean or nil
 end
 
-lib.callback.register('p_outfits:list', function(source)
-    local identifier = getIdentifier(source)
-    if not identifier then return {} end
+exports('sanitize', sanitize)
+exports('itemName', function() return ITEM end)
 
-    local rows = MySQL.query.await('SELECT id, name, data FROM p_outfits WHERE identifier = ? ORDER BY id', { identifier }) or {}
-    local list = {}
+-- la piece portee correspond-elle a la tenue ? (toutes les cles de l'emplacement identiques)
+local function matches(meta, slotSkin, outfit)
+    for key, default in pairs(slotSkin) do
+        local expected = outfit[key]
+        if expected == nil then expected = default end
+        if not meta or meta[key] ~= expected then return false end
+    end
+    return true
+end
 
-    for i = 1, #rows do
-        list[i] = { id = rows[i].id, name = rows[i].name, data = json.decode(rows[i].data) }
+local function isDefault(meta, slotSkin)
+    for key, default in pairs(slotSkin) do
+        if meta[key] ~= default then return false end
+    end
+    return true
+end
+
+local function store(src, item)
+    -- true = la piece peut quitter son emplacement (rangee dans l'inventaire, ou supprimee si StoreReplacedPieces = false)
+    if not Config.StoreReplacedPieces then return true end
+    return exports.ox_inventory:AddItem(src, item.name, item.count, item.metadata) and true or false
+end
+
+--- Retire la tenue `old` (pieces identiques detruites, pieces differentes rangees) puis equipe `new`.
+local function applyChange(src, old, new)
+    local sex = sexOf(src)
+    local kept = 0
+
+    -- 1. retirer la tenue precedente
+    if old then
+        for slot, cfg in pairs(getSlots()) do
+            local item = exports.ox_inventory:GetSlot(src, slot)
+            local slotSkin = cfg.skin and cfg.skin[sex]
+
+            if item and slotSkin and item.name == cfg.itemName then
+                if matches(item.metadata, slotSkin, old) then
+                    exports.ox_inventory:RemoveItem(src, item.name, item.count, item.metadata, slot)
+                elseif store(src, item) then
+                    exports.ox_inventory:RemoveItem(src, item.name, item.count, item.metadata, slot)
+                else
+                    kept += 1
+                end
+            end
+        end
     end
 
-    return list
-end)
+    -- 2. equiper la nouvelle
+    if new then
+        for slot, cfg in pairs(getSlots()) do
+            local slotSkin = cfg.skin and cfg.skin[sex]
 
-lib.callback.register('p_outfits:save', function(source, name, data)
-    local identifier = getIdentifier(source)
-    if not identifier then return false, 'error' end
+            if slotSkin then
+                local meta = {}
+                for key, default in pairs(slotSkin) do
+                    meta[key] = new[key] ~= nil and new[key] or default
+                end
 
-    if type(name) ~= 'string' then return false, 'invalid' end
-    name = name:gsub('%s+', ' '):gsub('^%s', ''):gsub('%s$', '')
-    if #name < 1 or #name > Config.MaxNameLength then return false, 'invalid' end
+                local item = exports.ox_inventory:GetSlot(src, slot)
+                local same = item and item.name == cfg.itemName and matches(item.metadata, slotSkin, new)
 
-    local clean = sanitizeOutfit(data)
-    if not clean then return false, 'error' end
+                if not same then
+                    local freed = true
 
-    local count = MySQL.scalar.await('SELECT COUNT(*) FROM p_outfits WHERE identifier = ?', { identifier }) or 0
-    if count >= Config.MaxOutfits then return false, 'full' end
+                    if item then
+                        if store(src, item) then
+                            exports.ox_inventory:RemoveItem(src, item.name, item.count, item.metadata, slot)
+                        elseif isDefault(meta, slotSkin) then
+                            freed = false
+                        else
+                            freed = false
+                            kept += 1
+                        end
+                    end
 
-    MySQL.insert.await('INSERT INTO p_outfits (identifier, name, data) VALUES (?, ?, ?)', { identifier, name, json.encode(clean) })
+                    if freed and not isDefault(meta, slotSkin) then
+                        exports.ox_inventory:AddItem(src, cfg.itemName, 1, meta, slot)
+                    end
+                end
+            end
+        end
+    end
 
-    return true, name
-end)
+    if kept > 0 then
+        TriggerClientEvent('ox_lib:notify', src, { type = 'warning', description = Config.Locale.kept:format(kept) })
+    elseif new then
+        TriggerClientEvent('ox_lib:notify', src, { type = 'success', description = Config.Locale.equipped })
+    elseif old then
+        TriggerClientEvent('ox_lib:notify', src, { type = 'inform', description = Config.Locale.removed })
+    end
+end
 
-lib.callback.register('p_outfits:delete', function(source, id)
-    local identifier = getIdentifier(source)
-    if not identifier or type(id) ~= 'number' then return false end
+local function slotNumber(v)
+    return type(v) == 'table' and v.slot or tonumber(v)
+end
 
-    return MySQL.update.await('DELETE FROM p_outfits WHERE id = ? AND identifier = ?', { id, identifier }) > 0
+CreateThread(function()
+    while GetResourceState('ox_inventory') ~= 'started' do Wait(200) end
+    Wait(1500)
+
+    exports.ox_inventory:registerHook('swapItems', function(payload)
+        local tenue = getOutfitSlot()
+        if not tenue then return true end
+
+        local src = payload.source
+        local fromN, toN = slotNumber(payload.fromSlot), slotNumber(payload.toSlot)
+        local toTenue = payload.toType == 'player' and toN == tenue
+        local fromTenue = payload.fromType == 'player' and fromN == tenue
+
+        if not toTenue and not fromTenue then return true end
+
+        local new, old
+
+        if toTenue then
+            -- seul le joueur lui-meme, seule une tenue
+            if payload.toInventory ~= src or payload.fromType ~= 'player' or payload.fromInventory ~= src then return false end
+            local from = payload.fromSlot
+            if type(from) ~= 'table' or from.name ~= ITEM then return false end
+            new = from
+
+            local current = exports.ox_inventory:GetSlot(src, tenue)
+            if current and current.name == ITEM then old = current end
+        end
+
+        if fromTenue then
+            if payload.fromInventory ~= src then return false end
+            old = payload.fromSlot
+
+            -- echange : l'item de destination va prendre la place dans le slot Tenue
+            local occupant = type(payload.toSlot) == 'table' and payload.toSlot.name and payload.toSlot or nil
+            if payload.toType == 'player' and payload.toInventory == src and not occupant then
+                local o = exports.ox_inventory:GetSlot(src, toN)
+                if o and o.name then occupant = o end
+            end
+            if occupant then
+                if occupant.name ~= ITEM then return false end
+                new = occupant
+            end
+        end
+
+        local newSkin = new and new.metadata and new.metadata.skin
+        if new then
+            if type(newSkin) ~= 'table' then return false end
+            local sex = new.metadata.sex
+            if sex and sex ~= sexOf(src) then
+                TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = Config.Locale.wrong_sex })
+                return false
+            end
+        end
+
+        local oldSkin = old and old.metadata and old.metadata.skin
+        if not new and not old then return true end
+
+        SetTimeout(Config.ApplyDelay, function()
+            applyChange(src, type(oldSkin) == 'table' and oldSkin or nil, newSkin)
+        end)
+
+        return true
+    end)
 end)

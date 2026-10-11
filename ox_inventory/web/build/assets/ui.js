@@ -421,6 +421,7 @@
     if (!has) {
       el._pic.removeAttribute('src');
       el._src = null;
+      if (el._outfit) el._label.textContent = ((window.INVENTORY_THEME || {}).tenue || {}).label || 'Tenue';
       return;
     }
 
@@ -461,14 +462,16 @@
     u.grid.textContent = '';
     u.slots = [];
     const isPlayerClothing = side === 'left' && inv.type === 'player' && state.options.clothing;
-    const visible = isPlayerClothing ? inv.slots - CLOTH_COUNT : inv.slots;
+    const extra = state.options.outfitslot && state.options.clothing ? 1 : 0;   // slot Tenue, affiché au milieu
+    const visible = isPlayerClothing ? inv.slots - CLOTH_COUNT - extra : inv.type === 'otherplayer' ? inv.slots - extra : inv.slots;
+    const clothBase = inv.slots - CLOTH_COUNT - extra;
     const frag = document.createDocumentFragment();
     for (let i = 0; i < visible; i++) {
       const el = createSlotEl();
       el._i = i; el._side = side;
       // inventaire d'un autre joueur : les 14 derniers slots sont des vêtements
-      if (inv.type === 'otherplayer' && state.options.clothing && i >= inv.slots - CLOTH_COUNT) {
-        el._cloth = CLOTH_KEYS[i - (inv.slots - CLOTH_COUNT)];
+      if (inv.type === 'otherplayer' && state.options.clothing && i >= clothBase) {
+        el._cloth = CLOTH_KEYS[i - clothBase];
         el.classList.add('cloth');
       }
       u.slots[i] = el;
@@ -482,8 +485,22 @@
     ui.clothR.textContent = '';
     ui.clothSlots = {};
     const inv = state.left;
+    const oldOutfit = $('#tenue-row .slot.outfit');
+    if (oldOutfit) oldOutfit.remove();
     if (!state.options.clothing || !inv.slots) return;
-    const base = inv.slots - CLOTH_COUNT;
+    const hasOutfit = !!state.options.outfitslot;
+    const base = inv.slots - CLOTH_COUNT - (hasOutfit ? 1 : 0);
+    if (hasOutfit) {
+      // le bouton "Tenue" devient un vrai slot de l'inventaire (dernier slot du joueur)
+      const idx = state.options.outfitslot - 1;
+      const el = createSlotEl();
+      el._i = idx; el._side = 'left'; el._outfit = true;
+      el.classList.add('outfit');
+      ui.clothSlots[idx] = el;
+      const btn = $('#tenue-row .tenue-slot');
+      if (btn) btn.style.display = 'none';
+      $('#tenue-row').appendChild(el);
+    }
     const mk = (key, parent) => {
       const idx = base + CLOTH_KEYS.indexOf(key);
       const el = createSlotEl();
@@ -683,7 +700,9 @@
   /* =====================================================================
    *  Actions : déplacement, achat, craft, utilisation
    * ===================================================================== */
-  function findTargetSlot(it, data, items) {
+  function findTargetSlot(it, data, allItems, invType) {
+    let items = allItems;
+    if (invType === 'player' && state.options.clothing) items = allItems.slice(0, allItems.length - CLOTH_COUNT - (state.options.outfitslot ? 1 : 0));
     if (data && data.stack) {
       const s = items.find(i => i.name === it.name && deepEqual(i.metadata, it.metadata));
       if (s) return s;
@@ -706,8 +725,9 @@
       if (state.right.id === o.metadata.container) return;
     }
 
-    const a = target ? tgtInv.items[target.item.slot - 1] : findTargetSlot(o, data, tgtInv.items);
+    const a = target ? tgtInv.items[target.item.slot - 1] : findTargetSlot(o, data, tgtInv.items, tgtInv.type);
     if (!a) return;
+    if (tgtInv === state.left && state.options.outfitslot && a.slot === state.options.outfitslot && o.name !== state.options.outfititem) return;
     if (a.metadata && a.metadata.container !== undefined && state.right.id === a.metadata.container) return;
 
     const count = state.shift && o.count > 1 && srcInv.type !== 'shop'
@@ -846,7 +866,7 @@
     moveGhost(e.clientX, e.clientY);
     const under = document.elementFromPoint(e.clientX, e.clientY);
     const target = under && under.closest ? under.closest('.slot') : null;
-    const valid = target && target._side !== undefined && target !== drag.srcEl && !(target._side === 'right' && ['shop', 'crafting'].includes(state.right.type));
+    const valid = target && target._side !== undefined && target !== drag.srcEl && !(target._side === 'right' && ['shop', 'crafting'].includes(state.right.type)) && !(target._outfit && (!drag.info.item || drag.info.item.name !== state.options.outfititem || drag.info.inventory !== 'player'));
     if (drag.overEl && drag.overEl !== target) drag.overEl.classList.remove('over');
     drag.overEl = valid ? target : null;
     if (valid) target.classList.add('over');

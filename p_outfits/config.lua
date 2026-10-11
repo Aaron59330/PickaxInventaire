@@ -1,30 +1,19 @@
 Config = {}
 
--- Nombre maximum de tenues sauvegardees par joueur
-Config.MaxOutfits = 10
+-- Nom de l'item "tenue" (doit exister dans ox_inventory/data/items.lua et correspondre a
+-- `inventory:outfititem` dans server.cfg si tu le changes)
+Config.ItemName = 'clothes_outfit'
 
--- Longueur maximale du nom d'une tenue
-Config.MaxNameLength = 30
+-- Delai (ms) entre le deplacement de la tenue et l'application des pieces
+Config.ApplyDelay = 100
 
--- Delai (ms) avant d'ouvrir le menu apres la fermeture de l'inventaire
-Config.OpenDelay = 250
-
--- Delai (ms) laisse a skinchanger pour appliquer la tenue avant la synchro des items
-Config.ApplyDelay = 400
+-- Apres equipement, les pieces portees avant (qui ne font pas partie de la tenue) sont rangees dans l'inventaire.
+-- Si l'inventaire est plein, la piece actuelle est conservee.
+Config.StoreReplacedPieces = true
 
 Config.Locale = {
-    title = 'Tenues',
-    save = 'Sauvegarder la tenue actuelle',
-    save_desc = 'Enregistre tous les vetements portes',
-    name_label = 'Nom de la tenue',
-    saved = 'Tenue "%s" sauvegardee',
-    wear = 'Porter cette tenue',
-    delete = 'Supprimer',
-    deleted = 'Tenue supprimee',
-    worn = 'Tenue "%s" equipee',
-    none = 'Aucune tenue sauvegardee',
-    full = 'Tu as atteint le maximum de tenues (%s)',
-    invalid = 'Nom de tenue invalide',
-    error = 'Une erreur est survenue',
-    confirm_delete = 'Supprimer la tenue "%s" ?',
+    wrong_sex = "Cette tenue n'est pas faite pour ton personnage",
+    equipped = 'Tenue equipee',
+    removed = 'Tenue retiree',
+    kept = "Inventaire plein : %s piece(s) n'ont pas pu etre rangees et restent portees",
 }

@@ -318,6 +318,8 @@ function client.openInventory(inv, data)
                 rename = shared.rename,
                 robclothes = shared.robclothes,
                 playerslots = shared.playerslots,
+                outfitslot = shared.outfitslot,
+                outfititem = shared.outfititem,
             }
         }
     })
@@ -1494,6 +1496,8 @@ RegisterNetEvent('ox_inventory:setPlayerInventory', function(currentDrops, inven
 				rename = shared.rename,
 				robclothes = shared.robclothes,
 				playerslots = shared.playerslots,
+				outfitslot = shared.outfitslot,
+				outfititem = shared.outfititem,
 			}
 		}
 	})

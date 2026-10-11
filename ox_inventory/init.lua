@@ -27,15 +27,31 @@ shared = {
     playerslots = GetConvarInt('inventory:slots', 50),
 }
 
+-- slots "normaux" du joueur (hors vetements et hors slot Tenue)
+shared.mainslots = shared.playerslots
+
 if shared.clothing then
     shared.playerslots += 14
 end
 
+-- slot "Tenue" (case du milieu en bas de l'inventaire) : un slot de plus, place APRES les 14 slots de vetements
+-- pour ne pas decaler p_itemclothes (l'export getPlayerInvSlots ne le compte pas)
+shared.outfititem = GetConvar('inventory:outfititem', 'clothes_outfit')
+
+if shared.clothing and GetConvarInt('inventory:outfitslot', 1) == 1 then
+    shared.playerslots += 1
+    shared.outfitslot = shared.playerslots
+end
+
 exports('getPlayerInvSlots', function()
-    return shared.playerslots
+    return shared.outfitslot and (shared.playerslots - 1) or shared.playerslots
 end)
 
-shared.dropslots = GetConvarInt('inventory:dropslots', shared.playerslots)
+exports('getOutfitSlot', function()
+    return shared.outfitslot
+end)
+
+shared.dropslots = GetConvarInt('inventory:dropslots', shared.outfitslot and (shared.playerslots - 1) or shared.playerslots)
 shared.dropweight = GetConvarInt('inventory:dropweight', shared.playerweight)
 
 do

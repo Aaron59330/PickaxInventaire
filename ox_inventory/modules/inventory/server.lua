@@ -1141,6 +1141,9 @@ function Inventory.AddItem(inv, item, count, metadata, slot, cb)
 		slotMetadata, slotCount = Items.Metadata(inv.id, item, metadata and table.clone(metadata) or {}, count)
 
 		for i = 1, inv.slots do
+			-- les slots de vetements et le slot Tenue ne servent jamais d'emplacement libre par defaut
+			if inv.player and shared.clothing and i > shared.mainslots then break end
+
 			local slotData = items[i]
 
 			if item.stack and slotData ~= nil and slotData.name == item.name and table.matches(slotData.metadata, slotMetadata) then
