@@ -208,9 +208,7 @@
       </div>
 
       <div class="tenue-row" id="tenue-row">
-        <button type="button" class="hex-btn active" data-ui-btn="character" title="Personnage">${ICON.user}</button>
         <button type="button" class="tenue-slot" data-ui-btn="outfit"><img data-role="tenue-img" alt=""><span data-role="tenue-label">Tenue</span></button>
-        <button type="button" class="hex-btn" data-ui-btn="extra" title="Autre">${ICON.plane}</button>
       </div>
 
       <button id="help-btn" type="button" title="Contrôles utiles">${ICON.help}</button>
@@ -299,7 +297,6 @@
     if (t.image) img.src = t.image; else img.style.display = 'none';
     const slot = $('#tenue-row .tenue-slot');
     if (!t.image) slot.classList.add('no-img');
-    if (t.hideButtons) app.querySelectorAll('#tenue-row .hex-btn').forEach(b => { b.style.display = 'none'; });
   })();
 
   // les boutons du bloc Tenue préviennent le client Lua (évènement ox_inventory:uiButton)
