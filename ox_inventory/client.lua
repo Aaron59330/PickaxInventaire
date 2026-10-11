@@ -33,7 +33,6 @@ local invBusy = true
 
 ---@type boolean?
 local invOpen = false
-local invClosing = false
 local plyState = LocalPlayer.state
 local IsPedCuffed = IsPedCuffed
 local playerPed = cache.ped
@@ -56,8 +55,6 @@ local function canOpenInventory()
         return shared.info('cannot open inventory', '(is busy)')
     end
 
-    -- verifie l'etat reel du ped (le statebag 'dead' peut rester desynchronise
-    -- apres un respawn/revive) et ne spam plus la console
     if IsEntityDead(playerPed) then
         return false
     end
@@ -122,11 +119,12 @@ local Inventory = require 'modules.inventory.client'
 ---@return boolean?
 local antiSpam = GetGameTimer()
 function client.openInventory(inv, data)
+	Citizen.Wait(200)
 	if antiSpam > GetGameTimer() then
 		return
 	end
 
-	antiSpam = GetGameTimer() + 250
+	antiSpam = GetGameTimer() + 500
 
 	if invOpen then
 		if not inv and currentInventory.type == 'newdrop' then
@@ -151,7 +149,7 @@ function client.openInventory(inv, data)
 			end
 		end
 	elseif IsNuiFocused() or IsPauseMenuActive() then
-		Wait(100)
+		Wait(300)
 	end
 
 	if inv == 'dumpster' and cache.vehicle then
@@ -282,7 +280,6 @@ function client.openInventory(inv, data)
         end
     end
 
-    invOpen = true
     plyState:set('invOpen', true, true)
 
     SetInterval(client.interval, 100)
@@ -364,7 +361,6 @@ exports('openInventory', client.openInventory)
 RegisterNetEvent('ox_inventory:forceOpenInventory', function(left, right)
 	if source == '' then return end
 
-	invOpen = true
 	plyState:set('invOpen', true, true)
 
 	SetInterval(client.interval, 100)
@@ -1030,14 +1026,16 @@ function client.closeInventory(server)
 
 	if invOpen then
 		invOpen = nil
-		invClosing = true
 		SetNuiFocus(false, false)
 		SetNuiFocusKeepInput(false)
 		Utils.blurOut()
 		closeTrunk()
+		Citizen.Wait(150) -- test
 		SendNUIMessage({ action = 'closeInventory' })
 		SetInterval(client.interval, 200)
-		Wait(50)
+		Wait(200)
+
+		if invOpen ~= nil then return end
 
 		if not server and currentInventory then
 			TriggerServerEvent('ox_inventory:closeInventory')
@@ -1045,8 +1043,6 @@ function client.closeInventory(server)
 
 		currentInventory = nil
 		defaultInventory.coords = nil
-		invOpen = false
-		invClosing = false
 		plyState:set('invOpen', false, true)
 		TriggerEvent('p_itemclothes:togglePed', false)
 	end
@@ -1268,8 +1264,6 @@ end)
 ---@type function?
 local function setStateBagHandler(stateId)
 	AddStateBagChangeHandler('invOpen', stateId, function(_, _, value)
-		-- ignore l'echo du statebag pendant la fermeture (sinon le joueur reste fige)
-		if invClosing then return end
 		invOpen = value
 	end)
 
@@ -1741,7 +1735,6 @@ end)
 RegisterNetEvent('ox_inventory:viewInventory', function(left, right)
 	if source == '' then return end
 
-	invOpen = true
 	plyState:set('invOpen', true, true)
 
 	SetInterval(client.interval, 100)
