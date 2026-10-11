@@ -235,6 +235,49 @@
     hotbar: $('#hotbar'), notifs: $('#notifs')
   };
 
+  /* ---------- thème (couleur de base) ---------- */
+  function hexToHsl(hex) {
+    const m = /^#?([0-9a-f]{6})$/i.exec(String(hex).trim());
+    if (!m) return null;
+    const n = parseInt(m[1], 16);
+    const r = (n >> 16 & 255) / 255, g = (n >> 8 & 255) / 255, b = (n & 255) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2;
+    let h = 0, s = 0;
+    if (max !== min) {
+      const d = max - min;
+      s = l > .5 ? d / (2 - max - min) : d / (max + min);
+      h = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+      h *= 60;
+    }
+    return { h, s, l };
+  }
+  function hslToRgb(h, s, l) {
+    s = Math.max(0, Math.min(1, s)); l = Math.max(0, Math.min(1, l));
+    const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l);
+    const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
+  }
+  const toHex = c => `#${c.map(v => v.toString(16).padStart(2, '0')).join('')}`;
+
+  function applyTheme(color) {
+    const hsl = hexToHsl(color);
+    if (!hsl) return console.warn(`[ox_inventory] couleur de thème invalide : ${color}`);
+    const root = document.documentElement.style;
+    const base = hslToRgb(hsl.h, hsl.s, hsl.l);
+    const light = hslToRgb(hsl.h, hsl.s, Math.min(.85, hsl.l + .1));
+    const dark = hslToRgb(hsl.h, hsl.s, Math.max(.12, hsl.l - .12));
+    const bg = hslToRgb(hsl.h, Math.min(.45, hsl.s), .08);
+    root.setProperty('--accent', toHex(base));
+    root.setProperty('--accent-2', toHex(light));
+    root.setProperty('--accent-light', toHex(hslToRgb(hsl.h, hsl.s, Math.min(.85, hsl.l + .06))));
+    root.setProperty('--accent-dark', toHex(dark));
+    root.setProperty('--accent-rgb', base.join(', '));
+    root.setProperty('--accent-light-rgb', light.join(', '));
+    root.setProperty('--accent-dark-rgb', dark.join(', '));
+    root.setProperty('--bg-rgb', bg.join(', '));
+  }
+  applyTheme((window.INVENTORY_THEME && window.INVENTORY_THEME.color) || '#7b4bb8');
+
   /* ---------- échelle ---------- */
   function rescale() {
     const s = Math.min(window.innerWidth / 1590, window.innerHeight / 868);
@@ -1117,6 +1160,7 @@
       case 'closeInventory': closeInventory(); break;
       case 'setInventoryVisible': data ? show() : hide(); break;
       case 'toggleHotbar': toggleHotbar(); break;
+      case 'setTheme': applyTheme(data && data.color || data); break;
       case 'itemNotify': itemNotify(data); break;
       case 'displayMetadata': {
         for (const m of data || []) if (!state.extraMeta.find(x => x.value === m.value)) state.extraMeta.push(m);
