@@ -226,6 +226,11 @@ button { font-family: inherit; }
 /* Slot "Tenue" réel (dernier slot du joueur) */
 .slot.outfit { width: 73px; height: 73px; border-color: rgba(255, 255, 255, .18); }
 .slot.outfit .label { display: block; bottom: 3px; font-size: 9.5px; }
-.slot.outfit:not(.has)::before { content: ''; position: absolute; left: 50%; top: 40%; width: 20px; height: 30px; transform: translate(-50%, -50%); border-radius: 10px 10px 4px 4px; background: rgba(255, 255, 255, .22); }
+.slot.outfit:not(.has)::before { content: ''; position: absolute; left: 50%; top: 42%; width: 40px; height: 40px; transform: translate(-50%, -50%); background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M32 10a4 4 0 1 1 4 4c-2.200.6-4 2-4 4.500v2.500'/><path d='M32 21 6 40a2.500 2.500 0 0 0 1.500 4.500h49A2.500 2.500 0 0 0 58 40Z'/></svg>") center / contain no-repeat; opacity: .32; transition: opacity .15s; }
+.slot.outfit:hover::before { opacity: .55; }
 .slot.outfit.has img.pic { width: 44px; height: 44px; top: 44%; }
 .slot.outfit .count { display: none !important; }
+
+.slot.outfit { background: radial-gradient(circle at 50% 38%, rgba(var(--accent-light-rgb), .22), transparent 70%), var(--slot-bg); box-shadow: 0 0 0 1px rgba(var(--accent-light-rgb), .18), 0 0 16px rgba(var(--accent-rgb), .25); }
+.slot.outfit.has img.pic { width: 54px; height: 54px; top: 42%; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .55)); }
+.slot.outfit .label { font-size: 9.5px; letter-spacing: .3px; text-transform: uppercase; opacity: .85; }
