@@ -1,0 +1,71 @@
+/* Surcouche visuelle : dimensions, disposition et interactions conservées. */
+:root {
+  --inventory-slot-radius: 12px;
+  --inventory-panel-radius: 12px;
+  --inventory-control-radius: 8px;
+  --inventory-accent: #3b82f6;
+  --inventory-accent-soft: rgba(59, 130, 246, .16);
+  --inventory-border: rgba(96, 165, 250, .30);
+  --inventory-hover-border: #60a5fa;
+  --inventory-slot-background: rgba(16, 25, 40, .80);
+  --inventory-panel-background: rgba(13, 21, 35, .96);
+  --inventory-glow: rgba(59, 130, 246, .18);
+}
+[data-inventory-theme="blue"] :is(.inventory-slot, .hotbar-item-slot, .item-notification-item-box) {
+  border-radius: var(--inventory-slot-radius);
+  border-image: none;
+  border-color: var(--inventory-border);
+  background-color: var(--inventory-slot-background);
+  box-shadow: inset 0 0 1rem rgba(0, 0, 0, .10), inset 0 1px 0 var(--inventory-accent-soft);
+}
+[data-inventory-theme="blue"] :is(.inventory-slot, .hotbar-item-slot):hover {
+  border-color: var(--inventory-hover-border);
+  box-shadow: inset 0 0 1rem var(--inventory-accent-soft), 0 0 .7rem var(--inventory-glow);
+}
+[data-inventory-theme="blue"] :is(.inventory-slot, .hotbar-item-slot, .item-notification-item-box)::before {
+  background-color: var(--inventory-accent);
+}
+[data-inventory-theme="blue"] .item-rarity-gradient {
+  border-bottom-left-radius: var(--inventory-slot-radius);
+  border-bottom-right-radius: var(--inventory-slot-radius);
+}
+[data-inventory-theme="blue"] :is(.context-menu-list, .tooltip-wrapper, .useful-controls-dialog) {
+  border-radius: var(--inventory-panel-radius);
+  border-image: none;
+  border-color: var(--inventory-border);
+  background: var(--inventory-panel-background);
+}
+[data-inventory-theme="blue"] :is(.inventory-control .inventory-control-input, .inventory-control .inventory-control-button, .context-menu-item) {
+  border-radius: var(--inventory-control-radius);
+  border-image: none;
+}
+[data-inventory-theme="blue"] .inventory-control .inventory-control-input {
+  border-color: var(--inventory-border);
+  background-color: var(--inventory-slot-background);
+}
+[data-inventory-theme="blue"] .inventory-control .inventory-control-input:focus-within {
+  border-color: var(--inventory-hover-border);
+  box-shadow: inset 0 0 1rem var(--inventory-accent-soft);
+}
+[data-inventory-theme="blue"] .inventory-control .inventory-control-button {
+  background-color: var(--inventory-accent-soft);
+  box-shadow: inset 0 0 0 1px var(--inventory-border);
+}
+[data-inventory-theme="blue"] :is(.inventory-control .inventory-control-button, .context-menu-item):hover {
+  background-color: var(--inventory-accent-soft);
+  box-shadow: inset 0 0 0 1px var(--inventory-hover-border);
+}
+[data-inventory-theme="blue"] .inventory-slot-number {
+  background-color: var(--inventory-accent-soft) !important;
+  border-color: var(--inventory-border);
+  border-radius: var(--inventory-control-radius);
+}
+[data-inventory-theme="blue"] :is(.inventory-theme-icon, .useful-controls-button) {
+  background-color: var(--inventory-slot-background) !important;
+  border-color: var(--inventory-border) !important;
+  border-image: none !important;
+  border-radius: var(--inventory-control-radius) !important;
+}
+[data-inventory-theme="blue"] .inventory-control .inventory-control-wrapper::before {
+  background-color: var(--inventory-accent);
+}
