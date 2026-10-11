@@ -18,6 +18,9 @@ window.INVENTORY_THEME = {
   backdrop: true,
   backdropOpacity: 1,
 
+  // Opacité du fond des cases : 0 = transparent, 1 = noir plein (0.36 par défaut)
+  slotOpacity: 0.36,
+
   // Logo affiché en haut au milieu : remplace web/build/assets/logo.png
   // par ton image (PNG transparent), ou mets logo: false pour le masquer.
   logo: 'assets/logo.png',

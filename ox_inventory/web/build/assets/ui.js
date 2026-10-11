@@ -290,6 +290,11 @@
     const logo = $('#logo');
     if (cfg.logo === false) logo.style.display = 'none';
     else if (typeof cfg.logo === 'string' && cfg.logo) logo.src = cfg.logo;
+    // opacité du fond des cases (0 = transparent, 1 = noir plein)
+    if (typeof cfg.slotOpacity === 'number') {
+      const o = Math.max(0, Math.min(1, cfg.slotOpacity));
+      document.documentElement.style.setProperty('--slot-bg', `rgba(8, 8, 12, ${o})`);
+    }
     // fond teinté derrière l'inventaire (désactivable dans theme.js)
     const bd = $('#backdrop');
     if (cfg.backdrop === false) bd.style.display = 'none';

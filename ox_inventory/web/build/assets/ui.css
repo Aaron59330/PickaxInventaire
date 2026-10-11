@@ -10,7 +10,7 @@
   --bg-rgb: 18, 12, 30;
   --accent-soft: rgba(var(--accent-rgb), .35);
   --accent-glow: rgba(var(--accent-light-rgb), .55);
-  --slot-bg: rgba(8, 8, 12, .62);
+  --slot-bg: rgba(8, 8, 12, .36);
   --slot-border: rgba(255, 255, 255, .06);
   --panel-text: #fff;
   --muted: rgba(255, 255, 255, .55);
