@@ -232,7 +232,19 @@ function Utils.blurIn()
     TriggerScreenblurFadeIn(100)
 end
 
+-- flou plein ecran (timecycle) : reste actif tant que l'inventaire est ouvert
+function Utils.fullBlurIn(strength)
+    Utils.fullBlur = true
+    SetTimecycleModifier('hud_def_blur')
+    SetTimecycleModifierStrength(strength or 1.0)
+end
+
 function Utils.blurOut()
+    if Utils.fullBlur then
+        Utils.fullBlur = false
+        ClearTimecycleModifier()
+    end
+
     if IsScreenblurFadeRunning() then
         DisableScreenblurFade()
     end
