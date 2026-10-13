@@ -110,10 +110,8 @@ else
         autoreload = GetConvarInt('inventory:autoreload', 0) == 1,
         screenblur = GetConvarInt('inventory:screenblur', 1) == 1,
         -- flou plein ecran derriere l'inventaire (quand p_itemclothes affiche le personnage au milieu)
-        -- inventory:blurstrength : 0 = pas de flou plein ecran, >0 = actif ; inventory:blurdark : noirceur du fond 0-255 ;
-        -- inventory:blurdelay : delai en ms apres l'ouverture
+        -- inventory:blurstrength : 0 = pas de flou plein ecran, >0 = actif ; inventory:blurdelay : delai en ms apres l'ouverture
         blurstrength = math.max(0, math.min(100, GetConvarInt('inventory:blurstrength', 100))) / 100,
-        blurdark = math.max(0, math.min(255, GetConvarInt('inventory:blurdark', 150))),
         blurdelay = GetConvarInt('inventory:blurdelay', 900),
         keys = json.decode(GetConvar('inventory:keys', '')) or { 'F2', 'K', 'TAB' },
         enablekeys = json.decode(GetConvar('inventory:enablekeys', '[249]')),

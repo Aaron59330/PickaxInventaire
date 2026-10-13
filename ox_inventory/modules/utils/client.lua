@@ -232,9 +232,9 @@ function Utils.blurIn()
     TriggerScreenblurFadeIn(100)
 end
 
--- flou plein ecran + fond noir : meme flou que le menu pause, le personnage du menu reste net.
--- dark = 0..255 (opacite du fond noir du menu pause, couleur HUD 117)
-function Utils.fullBlurIn(dark)
+-- flou plein ecran : meme flou que le menu pause, le personnage du menu reste net.
+-- (la couleur HUD 117 n'est volontairement pas touchee : elle dessine un rectangle visible a l'ecran)
+function Utils.fullBlurIn()
     Utils.fullBlur = true
 
     if IsScreenblurFadeRunning() then
@@ -242,10 +242,6 @@ function Utils.fullBlurIn(dark)
     end
 
     TriggerScreenblurFadeIn(300)
-
-    if dark and dark > 0 then
-        ReplaceHudColourWithRgba(117, 0, 0, 0, dark)
-    end
 end
 
 function Utils.blurOut()
