@@ -30,7 +30,7 @@ button { font-family: inherit; }
 /* ---------- Fond ---------- */
 #backdrop {
   position: fixed; inset: 0; opacity: 0; transition: opacity .18s ease;
-  background: radial-gradient(ellipse at center, rgba(var(--bg-rgb), .35) 0%, rgba(var(--bg-rgb), .75) 100%);
+  background: radial-gradient(ellipse at center, rgba(var(--backdrop-rgb, 0, 0, 0), .12) 0%, rgba(var(--backdrop-rgb, 0, 0, 0), .55) 100%);
 }
 #app.open #backdrop { opacity: var(--backdrop-opacity, 1); }
 

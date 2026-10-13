@@ -304,7 +304,7 @@ function client.openInventory(inv, data)
     -- p_itemclothes retire tout flou a l'ouverture : on applique le flou plein ecran APRES, quand le personnage est affiche
     if client.screenblur and client.blurstrength > 0 and GetResourceState('p_itemclothes') == 'started' then
         SetTimeout(client.blurdelay, function()
-            if invOpen == true then Utils.fullBlurIn(client.blurstrength) end
+            if invOpen == true then Utils.fullBlurIn(client.blurdark) end
         end)
     end
 

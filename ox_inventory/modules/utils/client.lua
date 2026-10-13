@@ -232,18 +232,24 @@ function Utils.blurIn()
     TriggerScreenblurFadeIn(100)
 end
 
--- flou plein ecran (timecycle) : reste actif tant que l'inventaire est ouvert
-function Utils.fullBlurIn(strength)
+-- flou plein ecran + fond noir : meme flou que le menu pause, le personnage du menu reste net.
+-- dark = 0..255 (opacite du fond noir du menu pause, couleur HUD 117)
+function Utils.fullBlurIn(dark)
     Utils.fullBlur = true
-    SetTimecycleModifier('hud_def_blur')
-    SetTimecycleModifierStrength(strength or 1.0)
+
+    if IsScreenblurFadeRunning() then
+        DisableScreenblurFade()
+    end
+
+    TriggerScreenblurFadeIn(300)
+
+    if dark and dark > 0 then
+        ReplaceHudColourWithRgba(117, 0, 0, 0, dark)
+    end
 end
 
 function Utils.blurOut()
-    if Utils.fullBlur then
-        Utils.fullBlur = false
-        ClearTimecycleModifier()
-    end
+    Utils.fullBlur = false
 
     if IsScreenblurFadeRunning() then
         DisableScreenblurFade()

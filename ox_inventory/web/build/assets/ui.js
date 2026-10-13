@@ -306,8 +306,13 @@
       const o = Math.max(0, Math.min(1, cfg.slotOpacity));
       document.documentElement.style.setProperty('--slot-bg', `rgba(8, 8, 12, ${o})`);
     }
-    // fond teinté derrière l'inventaire (désactivable dans theme.js)
+    // fond derrière l'inventaire (désactivable / réglable dans theme.js)
     const bd = $('#backdrop');
+    {
+      const m = /^#?([0-9a-f]{6})$/i.exec(String(cfg.backdropColor || '#000000').trim());
+      const v = parseInt((m || [0, '000000'])[1], 16);
+      document.documentElement.style.setProperty('--backdrop-rgb', `${v >> 16 & 255}, ${v >> 8 & 255}, ${v & 255}`);
+    }
     if (cfg.backdrop === false) bd.style.display = 'none';
     else if (typeof cfg.backdropOpacity === 'number') bd.style.setProperty('--backdrop-opacity', String(Math.max(0, Math.min(1, cfg.backdropOpacity))));
     const t = cfg.tenue || {};

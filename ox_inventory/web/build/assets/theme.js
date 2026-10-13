@@ -16,6 +16,7 @@ window.INVENTORY_THEME = {
   // Le flou de l'écran du jeu (derrière l'interface) se règle côté serveur :
   //   set inventory:screenblur 0   dans server.cfg
   backdrop: true,
+  backdropColor: '#000000',   // couleur du fond (noir par défaut)
   backdropOpacity: 1,
 
   // Opacité du fond des cases : 0 = transparent, 1 = noir plein (0.36 par défaut)
